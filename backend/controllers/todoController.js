@@ -9,7 +9,7 @@ module.exports.saveTodo = async (req, res) => {
   const { text } = req.body;
   todoModel.create({ text }).then((data) => {
     console.log("Added Successfully...");
-    console.log(data);
+    res.status(201);
     res.send(data);
   });
 };

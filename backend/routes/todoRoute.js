@@ -12,4 +12,9 @@ router.post("/save", saveTodo);
 router.post("/update", updateTodo);
 router.post("/delete", deleteTodo);
 
+// router.get("/todo", getTodo);
+// router.post("/todo", saveTodo);
+// router.patch("/todo", updateTodo);
+// router.delete("/todo", deleteTodo);
+
 module.exports = router;
