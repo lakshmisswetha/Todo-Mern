@@ -16,15 +16,19 @@ const getAllTodo = async (setTodo) => {
 
 const addTodo = async (text, setText, setTodo) => {
     try {
-        const data = await fetch(`${baseUrl}/todo`, {
+        const response = await fetch(`${baseUrl}/todo`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ text }),
         });
-        setText("");
-        await getAllTodo(setTodo);
+        if (response.ok) {
+            setText("");
+            await getAllTodo(setTodo);
+        } else {
+            console.log(response);
+        }
     } catch (err) {
         console.log(err);
     }
@@ -32,16 +36,20 @@ const addTodo = async (text, setText, setTodo) => {
 
 const updateTodo = async (todoId, text, setText, setTodo, setIsUpdating) => {
     try {
-        const data = await fetch(`${baseUrl}/todo`, {
+        const response = await fetch(`${baseUrl}/todo`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ _id: todoId, text }),
         });
-        setText("");
-        setIsUpdating(false);
-        await getAllTodo(setTodo);
+        if (response.ok) {
+            setText("");
+            setIsUpdating(false);
+            await getAllTodo(setTodo);
+        } else {
+            console.log(response);
+        }
     } catch (err) {
         console.log(err);
     }
@@ -49,14 +57,18 @@ const updateTodo = async (todoId, text, setText, setTodo, setIsUpdating) => {
 
 const deleteTodo = async (_id, setTodo) => {
     try {
-        const data = await fetch(`${baseUrl}/todo`, {
+        const response = await fetch(`${baseUrl}/todo`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ _id }),
         });
-        getAllTodo(setTodo);
+        if (response.ok) {
+            getAllTodo(setTodo);
+        } else {
+            console.log(response);
+        }
     } catch (err) {
         console.log(err);
     }
