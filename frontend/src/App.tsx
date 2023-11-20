@@ -2,17 +2,44 @@ import { useEffect, useState } from "react";
 import Todo from "./components/Todo";
 import { BASE_URL } from "./utils/config";
 import { TextField, Button } from "@mui/material";
+import { useFormik } from "formik";
+import * as yup from "yup";
+
+// import { z } from "zod";
 
 interface ITodoModel {
     _id: string;
     text: string;
 }
+const basicSchema = yup.object().shape({
+    text: yup.string().max(4, "Maximum 4 characters"),
+});
+
+// const basicSchema = z.object({
+//     text: z.string().max(4, "maximum 4 allowed"),
+// });
+const onSubmit = () => {
+    console.log("submitted");
+};
 
 const App = (): JSX.Element => {
     const [todo, setTodo] = useState<ITodoModel[]>([]);
     const [text, setText] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
     const [todoId, setTodoId] = useState("");
+
+    const { values, errors, handleChange, handleSubmit } = useFormik({
+        initialValues: {
+            text: "",
+        },
+        validationSchema: basicSchema,
+        onSubmit,
+    });
+
+    console.log(errors);
+    // const handleTextChange = (e: any) => {
+    //     setFieldValue("text", e.target.value);
+    // };
 
     const fetchTodo = async () => {
         const response = await fetch(`${BASE_URL}/todo`);
@@ -103,32 +130,18 @@ const App = (): JSX.Element => {
         <div className="App">
             <div className="container max-w-[600px] m-auto px-4 ">
                 <h1 className="mt-4 text-center font-bold text-3xl">Todo App</h1>
-                <div className="top mt-4 flex gap-4 justify-center">
-                    {/* <input
-                        className="outline-none w-[400px] p-[0.5rem] border-b border-solid border-black "
-                        type="text"
-                        placeholder="Add Todos..."
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                    /> */}
+                <form onSubmit={handleSubmit} className="top mt-4 flex gap-4 justify-center">
                     <TextField
                         id="standard-basic"
-                        label="Add Todos..."
+                        label={errors.text ? "error" : "Add Todos..."}
                         sx={{ width: "300px" }}
                         variant="standard"
-                        value={text || ""}
-                        onChange={(e) => setText(e.target.value)}
+                        value={values.text}
+                        onChange={handleChange}
+                        error={Boolean(errors.text)}
+                        helperText={errors.text ? "Too Long" : ""}
+                        name="text"
                     />
-                    {/* <div
-                        onClick={
-                            isUpdating
-                                ? () => updateTodo(todoId, text, setText, setIsUpdating)
-                                : () => addTodo(text, setText)
-                        }
-                        className="add cursor-pointer px-[1.5rem] py-[0.5rem] bg-black text-white"
-                    >
-                        {isUpdating ? "Update" : "Add"}
-                    </div> */}
                     <Button
                         onClick={
                             isUpdating
@@ -141,7 +154,7 @@ const App = (): JSX.Element => {
                     >
                         {isUpdating ? "Update" : "Add"}
                     </Button>
-                </div>
+                </form>
                 <div className="list">
                     {todo.map((item: ITodoModel) => (
                         <Todo
