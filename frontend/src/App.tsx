@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Todo from "./components/Todo";
 import { BASE_URL } from "./utils/config";
+import { TextField, Button } from "@mui/material";
 
 interface ITodoModel {
     _id: string;
@@ -103,14 +104,22 @@ const App = (): JSX.Element => {
             <div className="container max-w-[600px] m-auto px-4 ">
                 <h1 className="mt-4 text-center font-bold text-3xl">Todo App</h1>
                 <div className="top mt-4 flex gap-4 justify-center">
-                    <input
+                    {/* <input
                         className="outline-none w-[400px] p-[0.5rem] border-b border-solid border-black "
                         type="text"
                         placeholder="Add Todos..."
                         value={text}
                         onChange={(e) => setText(e.target.value)}
+                    /> */}
+                    <TextField
+                        id="standard-basic"
+                        label="Add Todos..."
+                        sx={{ width: "300px" }}
+                        variant="standard"
+                        value={text || ""}
+                        onChange={(e) => setText(e.target.value)}
                     />
-                    <div
+                    {/* <div
                         onClick={
                             isUpdating
                                 ? () => updateTodo(todoId, text, setText, setIsUpdating)
@@ -119,7 +128,19 @@ const App = (): JSX.Element => {
                         className="add cursor-pointer px-[1.5rem] py-[0.5rem] bg-black text-white"
                     >
                         {isUpdating ? "Update" : "Add"}
-                    </div>
+                    </div> */}
+                    <Button
+                        onClick={
+                            isUpdating
+                                ? () => updateTodo(todoId, text, setText, setIsUpdating)
+                                : () => addTodo(text, setText)
+                        }
+                        variant="contained"
+                        sx={{ width: "100px" }}
+                        style={{ backgroundColor: "black" }}
+                    >
+                        {isUpdating ? "Update" : "Add"}
+                    </Button>
                 </div>
                 <div className="list">
                     {todo.map((item: ITodoModel) => (

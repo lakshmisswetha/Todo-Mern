@@ -1,6 +1,10 @@
 import { FC } from "react";
 import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
+import IconButton from "@mui/material/IconButton";
+
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 interface TodoProps {
     text: string;
@@ -13,14 +17,14 @@ const Todo: FC<TodoProps> = ({ text, updateMode, deleteTodo }) => {
         <div className="todo relative mt-4 bg-black py-[1.5rem] px-[3rem] rounded-[5px]">
             <div className="text text-white">{text}</div>
             <div className="icons absolute top-1/2 transform -translate-y-1/2 right-[20px] flex gap-[0.5rem]">
-                <BiEdit
-                    className="icon text-white cursor-pointer text-[20px]"
+                <EditIcon
+                    style={{ color: "white", cursor: "pointer" }}
                     onClick={updateMode}
-                />
-                <AiFillDelete
-                    className="icon text-white cursor-pointer text-[20px]"
+                ></EditIcon>
+                <DeleteIcon
+                    style={{ color: "white", cursor: "pointer" }}
                     onClick={deleteTodo}
-                />
+                ></DeleteIcon>
             </div>
         </div>
     );
