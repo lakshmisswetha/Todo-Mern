@@ -1,8 +1,4 @@
 import { FC } from "react";
-import { BiEdit } from "react-icons/bi";
-import { AiFillDelete } from "react-icons/ai";
-import IconButton from "@mui/material/IconButton";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
