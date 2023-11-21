@@ -148,22 +148,8 @@ const App = (): JSX.Element => {
                             error={Boolean(errors.text)}
                             helperText={errors.text ? "Too Long" : ""}
                             name="text"
-                            // InputLabelProps={{
-                            //     style: {
-                            //         color: "black",
-                            //     },
-                            // }}
-                            // sx={{
-                            //     "& .MuiInput-underline::after": { borderBottomColor: "black" },
-                            //     width: "300px",
-                            // }}
                         />
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            sx={{ width: "100px" }}
-                            //style={{ backgroundColor: "black" }}
-                        >
+                        <Button type="submit" variant="contained" sx={{ width: "100px" }}>
                             {isUpdating ? "Update" : "Add"}
                         </Button>
                     </form>
