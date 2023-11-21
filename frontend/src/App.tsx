@@ -1,45 +1,54 @@
 import { useEffect, useState } from "react";
 import Todo from "./components/Todo";
 import { BASE_URL } from "./utils/config";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, ThemeProvider } from "@mui/material";
 import { useFormik } from "formik";
-import * as yup from "yup";
+// import * as yup from "yup";
+import { z } from "zod";
+import { toFormikValidate } from "zod-formik-adapter";
+import { createTheme } from "@mui/material/styles";
 
-// import { z } from "zod";
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: "#000",
+        },
+    },
+});
 
 interface ITodoModel {
     _id: string;
     text: string;
 }
-const basicSchema = yup.object().shape({
-    text: yup.string().max(4, "Maximum 4 characters"),
-});
-
-// const basicSchema = z.object({
-//     text: z.string().max(4, "maximum 4 allowed"),
+// const basicSchema = yup.object().shape({
+//     text: yup.string().max(4, "Maximum 4 characters"),
 // });
-const onSubmit = () => {
-    console.log("submitted");
-};
+
+const basicSchema = z.object({
+    text: z.string().max(5, "maximum 5 allowed"),
+});
 
 const App = (): JSX.Element => {
     const [todo, setTodo] = useState<ITodoModel[]>([]);
-    const [text, setText] = useState("");
+
     const [isUpdating, setIsUpdating] = useState(false);
     const [todoId, setTodoId] = useState("");
+
+    const onSubmit = () => {
+        if (isUpdating) {
+            updateTodo(todoId, values.text, setIsUpdating);
+        } else {
+            addTodo(values.text);
+        }
+    };
 
     const { values, errors, handleChange, handleSubmit } = useFormik({
         initialValues: {
             text: "",
         },
-        validationSchema: basicSchema,
+        validate: toFormikValidate(basicSchema),
         onSubmit,
     });
-
-    console.log(errors);
-    // const handleTextChange = (e: any) => {
-    //     setFieldValue("text", e.target.value);
-    // };
 
     const fetchTodo = async () => {
         const response = await fetch(`${BASE_URL}/todo`);
@@ -50,7 +59,7 @@ const App = (): JSX.Element => {
             console.log(data);
         }
     };
-    const addTodo = async (text: string, setText: React.Dispatch<React.SetStateAction<string>>) => {
+    const addTodo = async (text: string) => {
         try {
             const response = await fetch(`${BASE_URL}/todo`, {
                 method: "POST",
@@ -60,7 +69,7 @@ const App = (): JSX.Element => {
                 body: JSON.stringify({ text }),
             });
             if (response.ok) {
-                setText("");
+                text = "";
                 await fetchTodo();
             } else {
                 console.log(response);
@@ -72,8 +81,6 @@ const App = (): JSX.Element => {
     const updateTodo = async (
         todoId: string,
         text: string,
-        setText: React.Dispatch<React.SetStateAction<string>>,
-
         setIsUpdating: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
         try {
@@ -85,7 +92,6 @@ const App = (): JSX.Element => {
                 body: JSON.stringify({ _id: todoId, text }),
             });
             if (response.ok) {
-                setText("");
                 setIsUpdating(false);
                 await fetchTodo();
             } else {
@@ -122,39 +128,47 @@ const App = (): JSX.Element => {
 
     const updateMode = (_id: string, text: string) => {
         setIsUpdating(true);
-        setText(text);
         setTodoId(_id);
+        values.text = text;
     };
 
     return (
         <div className="App">
             <div className="container max-w-[600px] m-auto px-4 ">
                 <h1 className="mt-4 text-center font-bold text-3xl">Todo App</h1>
-                <form onSubmit={handleSubmit} className="top mt-4 flex gap-4 justify-center">
-                    <TextField
-                        id="standard-basic"
-                        label={errors.text ? "error" : "Add Todos..."}
-                        sx={{ width: "300px" }}
-                        variant="standard"
-                        value={values.text}
-                        onChange={handleChange}
-                        error={Boolean(errors.text)}
-                        helperText={errors.text ? "Too Long" : ""}
-                        name="text"
-                    />
-                    <Button
-                        onClick={
-                            isUpdating
-                                ? () => updateTodo(todoId, text, setText, setIsUpdating)
-                                : () => addTodo(text, setText)
-                        }
-                        variant="contained"
-                        sx={{ width: "100px" }}
-                        style={{ backgroundColor: "black" }}
-                    >
-                        {isUpdating ? "Update" : "Add"}
-                    </Button>
-                </form>
+                <ThemeProvider theme={theme}>
+                    <form onSubmit={handleSubmit} className="top mt-4 flex gap-4 justify-center">
+                        <TextField
+                            id="standard-basic"
+                            label={errors.text ? "error" : "Add Todos..."}
+                            sx={{ width: "300px" }}
+                            variant="standard"
+                            value={values.text}
+                            onChange={handleChange}
+                            error={Boolean(errors.text)}
+                            helperText={errors.text ? "Too Long" : ""}
+                            name="text"
+                            // InputLabelProps={{
+                            //     style: {
+                            //         color: "black",
+                            //     },
+                            // }}
+                            // sx={{
+                            //     "& .MuiInput-underline::after": { borderBottomColor: "black" },
+                            //     width: "300px",
+                            // }}
+                        />
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            sx={{ width: "100px" }}
+                            //style={{ backgroundColor: "black" }}
+                        >
+                            {isUpdating ? "Update" : "Add"}
+                        </Button>
+                    </form>
+                </ThemeProvider>
+
                 <div className="list">
                     {todo.map((item: ITodoModel) => (
                         <Todo
