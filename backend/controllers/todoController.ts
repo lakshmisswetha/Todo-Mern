@@ -1,6 +1,15 @@
-const todoModel = require("../models/todoModel");
+import { Request, Response } from "express";
+import todoModel from "../models/todoModel";
 
-module.exports.getTodo = async (req, res) => {
+interface SaveTodoRequest {
+    text: string;
+}
+interface UpdateTodoRequest {
+    _id: string;
+    text: string;
+}
+
+export const getTodo = async (req: Request, res: Response) => {
     try {
         const data = await todoModel.find({}, { __v: 0 });
         return res.status(200).json({
@@ -14,9 +23,9 @@ module.exports.getTodo = async (req, res) => {
     }
 };
 
-module.exports.saveTodo = async (req, res) => {
+export const saveTodo = async (req: Request, res: Response) => {
     try {
-        const { text } = req.body;
+        const { text }: SaveTodoRequest = req.body;
         const data = await todoModel.create({ text });
         return res.status(201).json({ status: true, todo: data });
     } catch (err) {
@@ -25,9 +34,9 @@ module.exports.saveTodo = async (req, res) => {
     }
 };
 
-module.exports.updateTodo = async (req, res) => {
+export const updateTodo = async (req: Request, res: Response) => {
     try {
-        const { _id, text } = req.body;
+        const { _id, text }: UpdateTodoRequest = req.body;
 
         const result = await todoModel.findByIdAndUpdate(
             _id,
@@ -42,9 +51,9 @@ module.exports.updateTodo = async (req, res) => {
     }
 };
 
-module.exports.deleteTodo = async (req, res) => {
+export const deleteTodo = async (req: Request, res: Response) => {
     try {
-        const { _id } = req.body;
+        const { _id }: { _id: string } = req.body;
         await todoModel.findByIdAndDelete(_id);
         return res.status(200).json({ status: true });
     } catch (err) {
