@@ -14,6 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTodo = exports.updateTodo = exports.saveTodo = exports.getTodo = void 0;
 const todoModel_1 = __importDefault(require("../models/todoModel"));
+// export function validateTodoSchema(
+//     req: Request,
+//     res: Response,
+//     next: NextFunction
+// ) {
+//     try {
+//         const data = saveTodoSchema.parse(req.body);
+//         req.validatedData = data;
+//         next();
+//     } catch (error) {
+//         return res.status(400).json({ status: false, message: "Invalid Data" });
+//     }
+// }
 const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = yield todoModel_1.default.find({}, { __v: 0 });
@@ -30,15 +43,9 @@ const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getTodo = getTodo;
 const saveTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { text } = req.body;
-        const data = yield todoModel_1.default.create({ text });
-        return res.status(201).json({ status: true, todo: data });
-    }
-    catch (err) {
-        console.log(err);
-        return res.status(500).json({ status: false });
-    }
+    const { text } = req.validatedData || { text: "" };
+    const data = yield todoModel_1.default.create({ text });
+    return res.status(201).json({ status: true, todo: data });
 });
 exports.saveTodo = saveTodo;
 const updateTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
