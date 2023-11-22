@@ -24,14 +24,9 @@ export const getTodo = async (req: Request, res: Response) => {
 };
 
 export const saveTodo = async (req: Request, res: Response) => {
-    try {
-        const { text }: SaveTodoRequest = req.body;
-        const data = await todoModel.create({ text });
-        return res.status(201).json({ status: true, todo: data });
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json({ status: false });
-    }
+    const { text }: SaveTodoRequest = req.body;
+    const data = await todoModel.create({ text });
+    return res.status(201).json({ status: true, todo: data });
 };
 
 export const updateTodo = async (req: Request, res: Response) => {
