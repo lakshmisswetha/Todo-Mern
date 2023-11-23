@@ -19,7 +19,6 @@ const validationSchemas_1 = require("../utils/validationSchemas");
 const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { pageIdx = 1, limit = 5 } = validationSchemas_1.paginationValidationSchema.parse(req.query);
-        console.log(req.query);
         const todoList = yield todoModel_1.default
             .find({})
             .sort({ createdAt: -1 })

@@ -1,1 +1,7 @@
 /node_modules
+<<<<<<< Updated upstream
+dist/
+/backend/dist/
+=======
+/dist
+>>>>>>> Stashed changes

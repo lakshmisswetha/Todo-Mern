@@ -15,10 +15,6 @@ exports.validateDelete = zod_1.z.object({
         .refine((val) => mongoose_1.default.Types.ObjectId.isValid(val), "Invalid Id"),
 });
 exports.validateUpdate = zod_1.z.object(Object.assign(Object.assign({}, exports.validateSave.shape), exports.validateDelete.shape));
-// export const paginationValidationSchema = z.object({
-//     pageIdx: z.number().positive().gt(0).default(1),
-//     limit: z.number().positive().gt(2).default(5),
-// });
 exports.paginationValidationSchema = zod_1.z.object({
     pageIdx: zod_1.z.coerce.number().positive().gt(0).default(2),
     limit: zod_1.z.coerce.number().positive().gt(2).default(5),

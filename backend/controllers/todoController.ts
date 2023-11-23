@@ -13,8 +13,6 @@ export const getTodo = async (req: Request, res: Response) => {
         const { pageIdx = 1, limit = 5 } = paginationValidationSchema.parse(
             req.query
         );
-        console.log(req.query);
-
         const todoList = await todoModel
             .find({})
             .sort({ createdAt: -1 })
