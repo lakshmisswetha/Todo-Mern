@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import Todo from "./components/Todo";
 import { BASE_URL } from "./utils/config";
-import { TextField, Button, ThemeProvider } from "@mui/material";
+import { TextField, Button, ThemeProvider, TablePagination } from "@mui/material";
 import { useFormik } from "formik";
-// import * as yup from "yup";
 import { z } from "zod";
 import { toFormikValidate } from "zod-formik-adapter";
 import { createTheme } from "@mui/material/styles";
@@ -20,9 +19,6 @@ interface ITodoModel {
     _id: string;
     text: string;
 }
-// const basicSchema = yup.object().shape({
-//     text: yup.string().max(4, "Maximum 4 characters"),
-// });
 
 const basicSchema = z.object({
     text: z.string().max(5, "maximum 5 allowed"),
@@ -33,6 +29,13 @@ const App = (): JSX.Element => {
 
     const [isUpdating, setIsUpdating] = useState(false);
     const [todoId, setTodoId] = useState("");
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+    const [paginationInfo, setPaginationInfo] = useState({
+        totalDocs: 5,
+        hasNext: false,
+        hasPrev: false,
+    });
 
     const onSubmit = () => {
         if (isUpdating) {
@@ -51,10 +54,16 @@ const App = (): JSX.Element => {
     });
 
     const fetchTodo = async () => {
-        const response = await fetch(`${BASE_URL}/todo`);
+        const response = await fetch(`${BASE_URL}/todo?pageIdx=${page}&limit=${limit}`);
         const data = await response.json();
+
         if (data.status) {
-            setTodo(data.todo as ITodoModel[]);
+            setTodo(data.data.todoList as ITodoModel[]);
+            setPaginationInfo({
+                totalDocs: data.data.totalDocs,
+                hasPrev: data.data.hasPrev,
+                hasNext: data.data.hasNext,
+            });
         } else {
             console.log(data);
         }
@@ -124,7 +133,7 @@ const App = (): JSX.Element => {
     useEffect(() => {
         //getAllTodo(setTodo);
         fetchTodo();
-    }, []);
+    }, [page, limit]);
 
     const updateMode = (_id: string, text: string) => {
         setIsUpdating(true);
@@ -164,6 +173,21 @@ const App = (): JSX.Element => {
                             deleteTodo={() => deleteTodo(item._id)}
                         />
                     ))}
+                </div>
+
+                <div className="w-100 flex justify-end">
+                    <TablePagination
+                        component={"div"}
+                        count={paginationInfo.totalDocs}
+                        page={page - 1}
+                        rowsPerPage={limit}
+                        onPageChange={(e, val) => setPage(val + 1)}
+                        onRowsPerPageChange={(e) => {
+                            setLimit(parseInt(e.target.value, 10));
+                            setPage(1);
+                        }}
+                        rowsPerPageOptions={[5, 10]}
+                    />
                 </div>
             </div>
         </div>

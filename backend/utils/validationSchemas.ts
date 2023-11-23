@@ -16,11 +16,6 @@ export const validateUpdate = z.object({
     ...validateDelete.shape,
 });
 
-// export const paginationValidationSchema = z.object({
-//     pageIdx: z.number().positive().gt(0).default(1),
-//     limit: z.number().positive().gt(2).default(5),
-// });
-
 export const paginationValidationSchema = z.object({
     pageIdx: z.coerce.number().positive().gt(0).default(2),
     limit: z.coerce.number().positive().gt(2).default(5),
