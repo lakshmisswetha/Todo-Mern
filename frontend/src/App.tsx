@@ -177,6 +177,7 @@ const App = (): JSX.Element => {
 
                 <div className="w-100 flex justify-end">
                     <TablePagination
+                        component={"div"}
                         count={paginationInfo.totalDocs}
                         page={page - 1}
                         rowsPerPage={limit}
