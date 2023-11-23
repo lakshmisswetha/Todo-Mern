@@ -1,21 +1,33 @@
 import { Request, Response } from "express";
-import { z } from "zod";
+import { any, z } from "zod";
 import todoModel from "../models/todoModel";
 import {
     validateDelete,
     validateSave,
     validateUpdate,
+    paginationValidationSchema,
 } from "../utils/validationSchemas";
 
 export const getTodo = async (req: Request, res: Response) => {
     try {
-        const data = await todoModel
-            .find({}, { __v: 0, versioning: false })
-            .sort({ createdAt: -1 });
+        const { pageIdx = 1, limit = 5 } = paginationValidationSchema.parse(
+            req.query
+        );
+        console.log(req.query);
+
+        const todoList = await todoModel
+            .find({})
+            .sort({ createdAt: -1 })
+            .skip((pageIdx - 1) * limit)
+            .limit(limit);
+
+        const totalDocs = await todoModel.find().count();
+        const hasprev = pageIdx > 1;
+        const hasNext = pageIdx * limit < totalDocs;
 
         return res.status(200).json({
             status: true,
-            todo: data,
+            data: { todoList, totalDocs, hasNext, hasprev },
             message: "Successfully fetched",
         });
     } catch (err) {
