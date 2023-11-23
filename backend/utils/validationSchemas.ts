@@ -13,3 +13,9 @@ export const validateUpdate = z.object({
     ...validateSave.shape,
     ...validateDelete.shape,
 });
+
+
+export const paginationValidationSchema = z.object({
+    pageIdx: z.coerce.number().positive().gt(0).default(2),
+    limit: z.coerce.number().positive().gt(2).default(5),
+});

@@ -18,12 +18,18 @@ const todoModel_1 = __importDefault(require("../models/todoModel"));
 const validationSchemas_1 = require("../utils/validationSchemas");
 const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield todoModel_1.default
-            .find({}, { __v: 0, versioning: false })
-            .sort({ createdAt: -1 });
+        const { pageIdx = 1, limit = 5 } = validationSchemas_1.paginationValidationSchema.parse(req.query);
+        const todoList = yield todoModel_1.default
+            .find({})
+            .sort({ createdAt: -1 })
+            .skip((pageIdx - 1) * limit)
+            .limit(limit);
+        const totalDocs = yield todoModel_1.default.find().count();
+        const hasprev = pageIdx > 1;
+        const hasNext = pageIdx * limit < totalDocs;
         return res.status(200).json({
             status: true,
-            todo: data,
+            data: { todoList, totalDocs, hasNext, hasprev },
             message: "Successfully fetched",
         });
     }
