@@ -5,12 +5,11 @@ import {
     updateTodo,
     deleteTodo,
 } from "../controllers/todoController";
-import { validateSaveTodo } from "../middlewares/todoValidation";
 
 const router = express.Router();
 
 router.get("/todo", getTodo);
-router.post("/todo", validateSaveTodo, saveTodo);
+router.post("/todo", saveTodo);
 router.patch("/todo", updateTodo);
 router.delete("/todo", deleteTodo);
 

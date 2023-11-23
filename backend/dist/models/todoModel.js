@@ -29,7 +29,6 @@ const todoSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
-});
+}, { timestamps: true });
 const TodoModel = mongoose_1.default.model("todoInfo", todoSchema);
 exports.default = TodoModel;
-//module.exports = mongoose.model("todoInfo", todoSchema);

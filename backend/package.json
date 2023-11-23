@@ -5,7 +5,8 @@
     "main": "Server.js",
     "scripts": {
         "start": "node dist/Server.js",
-        "watch": "node node_modules/nodemon/bin/nodemon.js dist/Server.js"
+        "watch": "nodemon",
+        "dev": "tsc && node --env-file=.env dist/Server.js"
     },
     "author": "",
     "license": "ISC",

@@ -13,23 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTodo = exports.updateTodo = exports.saveTodo = exports.getTodo = void 0;
+const zod_1 = require("zod");
 const todoModel_1 = __importDefault(require("../models/todoModel"));
-// export function validateTodoSchema(
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-// ) {
-//     try {
-//         const data = saveTodoSchema.parse(req.body);
-//         req.validatedData = data;
-//         next();
-//     } catch (error) {
-//         return res.status(400).json({ status: false, message: "Invalid Data" });
-//     }
-// }
+const validationSchemas_1 = require("../utils/validationSchemas");
 const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield todoModel_1.default.find({}, { __v: 0 });
+        const data = yield todoModel_1.default
+            .find({}, { __v: 0, versioning: false })
+            .sort({ createdAt: -1 });
         return res.status(200).json({
             status: true,
             todo: data,
@@ -43,15 +34,30 @@ const getTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getTodo = getTodo;
 const saveTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { text } = req.validatedData || { text: "" };
-    const data = yield todoModel_1.default.create({ text });
-    return res.status(201).json({ status: true, todo: data });
+    try {
+        const data = yield todoModel_1.default.create({
+            text: validationSchemas_1.validateSave.parse(req.body).text,
+            date: new Date(),
+        });
+        return res.status(201).json({ status: true, todo: data });
+    }
+    catch (err) {
+        console.log(err);
+        if (err instanceof zod_1.z.ZodError) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid Data",
+                error: err.errors,
+            });
+        }
+        return res.status(500).json({ status: false });
+    }
 });
 exports.saveTodo = saveTodo;
 const updateTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { _id, text } = req.body;
-        const result = yield todoModel_1.default.findByIdAndUpdate(_id, { text }, { new: true });
+        const { _id, text } = validationSchemas_1.validateUpdate.parse(req.body);
+        const result = yield todoModel_1.default.findByIdAndUpdate(_id, { text: text }, { new: true });
         if (result)
             return res.status(200).json({ status: true });
         else
@@ -59,18 +65,32 @@ const updateTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     catch (err) {
         console.log(err);
+        if (err instanceof zod_1.z.ZodError) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid Data",
+                error: err.errors,
+            });
+        }
         return res.status(500).json({ status: false });
     }
 });
 exports.updateTodo = updateTodo;
 const deleteTodo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { _id } = req.body;
+        const { _id } = validationSchemas_1.validateDelete.parse(req.body);
         yield todoModel_1.default.findByIdAndDelete(_id);
         return res.status(200).json({ status: true });
     }
     catch (err) {
         console.log(err);
+        if (err instanceof zod_1.z.ZodError) {
+            return res.status(400).json({
+                status: false,
+                message: "Invalid Data",
+                error: err.errors,
+            });
+        }
         return res.status(500).json({ status: false });
     }
 });
