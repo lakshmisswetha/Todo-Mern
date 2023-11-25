@@ -4,7 +4,6 @@ const morgan = require("morgan");
 import mongoose from "mongoose";
 import cors from "cors";
 import routes from "./routes/todoRoute";
-
 const app: Express = express();
 const PORT = Number(process.env.PORT);
 
