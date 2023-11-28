@@ -10,7 +10,7 @@ interface TodoProps {
 
 const Todo: FC<TodoProps> = ({ text, updateMode, deleteTodo }) => {
     return (
-        <div className="todo relative mt-4 bg-black py-[1.5rem] px-[3rem] rounded-[5px]">
+        <div className="todo relative  mt-5 bg-black py-[1.5rem] px-[3rem] rounded-[5px]">
             <div className="text text-white">{text}</div>
             <div className="icons absolute top-1/2 transform -translate-y-1/2 right-[20px] flex gap-[0.5rem]">
                 <EditIcon

@@ -1,6 +1,11 @@
 import { TextField, ThemeProvider, Checkbox, Button } from "@mui/material";
+import { useState } from "react";
 import { createTheme } from "@mui/material/styles";
 import coverImage from "../assets/login-img.jpg";
+import { Link } from "react-router-dom";
+import { Icon } from "react-icons-kit";
+import { eyeOff } from "react-icons-kit/feather/eyeOff";
+import { eye } from "react-icons-kit/feather/eye";
 
 const theme = {
     palette: {
@@ -14,6 +19,20 @@ const themes = createTheme(theme);
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 const Login = () => {
+    const [password, setPassword] = useState("");
+    const [type, setType] = useState("password");
+    const [icon, setIcon] = useState(eyeOff);
+
+    const handleToggle = () => {
+        if (type === "password") {
+            setIcon(eye);
+            setType("text");
+        } else {
+            setIcon(eyeOff);
+            setType("password");
+        }
+    };
+
     return (
         <div className=" h-screen bg-white-50 flex justify-between">
             <div className="p-[100px]">
@@ -35,13 +54,31 @@ const Login = () => {
                             variant="standard"
                             style={{ marginBottom: "10px" }}
                         />
-                        <TextField id="standard-basic" label="Password" variant="standard" />
+                        <div className="flex ">
+                            <TextField
+                                id="standard-basic"
+                                label="Password"
+                                variant="standard"
+                                type={type}
+                                style={{ width: "500px" }}
+                            />
+                            <span
+                                className="flex justify-around items-center"
+                                onClick={handleToggle}
+                            >
+                                <Icon
+                                    className="absolute mr-10 cursor-pointer"
+                                    icon={icon}
+                                    size={20}
+                                />
+                            </span>
+                        </div>
                         <div className="flex justify-between items-center mt-2">
                             <div className="flex items-center ">
                                 <Checkbox {...label} defaultChecked />
                                 <div className="text-black">Remember for 30 days</div>
                             </div>
-                            <div className="forgot-pswd text-black items-center ">
+                            <div className="forgot-pswd text-black items-center cursor-pointer ">
                                 Forgot Password?
                             </div>
                         </div>
@@ -51,8 +88,8 @@ const Login = () => {
                     </form>
                 </ThemeProvider>
 
-                <div className="text-blue-900 font-semibold text-center">
-                    Don't have an account? SIGN UP
+                <div className="text-blue-900 font-semibold text-center cursor-pointer">
+                    <Link to={"/signup"}>Don't have an account? SIGN UP</Link>
                 </div>
             </div>
         </div>
