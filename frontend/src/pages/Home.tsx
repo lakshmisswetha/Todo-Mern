@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Todo from "../components/Todo";
 import { BASE_URL } from "../utils/config";
-import { TextField, Button, ThemeProvider, TablePagination } from "@mui/material";
+import { TextField, Button, ThemeProvider, TablePagination, Skeleton, Stack } from "@mui/material";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidate } from "zod-formik-adapter";
@@ -36,6 +36,7 @@ const Home = (): JSX.Element => {
         hasNext: false,
         hasPrev: false,
     });
+    const [loading, setLoading] = useState(true);
 
     const onSubmit = () => {
         if (isUpdating) {
@@ -54,6 +55,7 @@ const Home = (): JSX.Element => {
     });
 
     const fetchTodo = async () => {
+        setLoading(true);
         const response = await fetch(`${BASE_URL}/todo?pageIdx=${page}&limit=${limit}`);
         const data = await response.json();
 
@@ -64,6 +66,7 @@ const Home = (): JSX.Element => {
                 hasPrev: data.data.hasPrev,
                 hasNext: data.data.hasNext,
             });
+            setLoading(false);
         } else {
             console.log(data);
         }
@@ -164,16 +167,25 @@ const Home = (): JSX.Element => {
                     </form>
                 </ThemeProvider>
 
-                <div className="list">
-                    {todo.map((item: ITodoModel) => (
-                        <Todo
-                            key={item._id}
-                            text={item.text}
-                            updateMode={() => updateMode(item._id, item.text)}
-                            deleteTodo={() => deleteTodo(item._id)}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <Stack spacing={1}>
+                        <Skeleton animation="wave" width={500} height={100} />
+                        <Skeleton animation="wave" width={500} height={100} />
+                        <Skeleton animation="wave" width={500} height={100} />
+                        <Skeleton animation="wave" width={500} height={100} />
+                    </Stack>
+                ) : (
+                    <div className="list">
+                        {todo.map((item: ITodoModel) => (
+                            <Todo
+                                key={item._id}
+                                text={item.text}
+                                updateMode={() => updateMode(item._id, item.text)}
+                                deleteTodo={() => deleteTodo(item._id)}
+                            />
+                        ))}
+                    </div>
+                )}
 
                 <div className="w-100 flex justify-end">
                     <TablePagination
