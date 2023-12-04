@@ -6,6 +6,7 @@ import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidate } from "zod-formik-adapter";
 import { createTheme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
     palette: {
@@ -25,6 +26,7 @@ const basicSchema = z.object({
 });
 
 const Home = (): JSX.Element => {
+    const navigate = useNavigate();
     const [todo, setTodo] = useState<ITodoModel[]>([]);
 
     const [isUpdating, setIsUpdating] = useState(false);
@@ -41,8 +43,10 @@ const Home = (): JSX.Element => {
     const onSubmit = () => {
         if (isUpdating) {
             updateTodo(todoId, values.text, setIsUpdating);
+            values.text = "";
         } else {
             addTodo(values.text);
+            values.text = "";
         }
     };
 
@@ -56,8 +60,17 @@ const Home = (): JSX.Element => {
 
     const fetchTodo = async () => {
         setLoading(true);
-        const response = await fetch(`${BASE_URL}/todo?pageIdx=${page}&limit=${limit}`);
+        const response = await fetch(`${BASE_URL}/todo?pageIdx=${page}&limit=${limit}`, {
+            headers: {
+                Authorization: "bearer " + localStorage.getItem("accessToken") || "",
+            },
+        });
         const data = await response.json();
+
+        if (response.status === 401) {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+        }
 
         if (data.status) {
             setTodo(data.data.todoList as ITodoModel[]);
@@ -77,14 +90,20 @@ const Home = (): JSX.Element => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: "bearer " + localStorage.getItem("accessToken") || "",
                 },
                 body: JSON.stringify({ text }),
             });
-            if (response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            }
+            const data = await response.json();
+            if (data.status) {
                 text = "";
                 await fetchTodo();
             } else {
-                console.log(response);
+                console.log(data);
             }
         } catch (err) {
             console.log(err);
@@ -100,14 +119,21 @@ const Home = (): JSX.Element => {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: "bearer " + localStorage.getItem("accessToken") || "",
                 },
                 body: JSON.stringify({ _id: todoId, text }),
             });
-            if (response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            }
+            const data = await response.json();
+            if (data.status) {
                 setIsUpdating(false);
+                values.text = "";
                 await fetchTodo();
             } else {
-                console.log(response);
+                console.log(data);
             }
         } catch (err) {
             console.log(err);
@@ -120,13 +146,19 @@ const Home = (): JSX.Element => {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: "bearer " + localStorage.getItem("accessToken") || "",
                 },
                 body: JSON.stringify({ _id }),
             });
-            if (response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            }
+            const data = await response.json();
+            if (data.status) {
                 fetchTodo();
             } else {
-                console.log(response);
+                console.log(data);
             }
         } catch (err) {
             console.log(err);
@@ -134,7 +166,6 @@ const Home = (): JSX.Element => {
     };
 
     useEffect(() => {
-        //getAllTodo(setTodo);
         fetchTodo();
     }, [page, limit]);
 
@@ -142,6 +173,11 @@ const Home = (): JSX.Element => {
         setIsUpdating(true);
         setTodoId(_id);
         values.text = text;
+    };
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        navigate("/");
     };
 
     return (
@@ -164,14 +200,14 @@ const Home = (): JSX.Element => {
                         <Button type="submit" variant="contained" sx={{ width: "100px" }}>
                             {isUpdating ? "Update" : "Add"}
                         </Button>
+                        <Button onClick={handleLogout} variant="contained" sx={{ width: "100px" }}>
+                            Logout
+                        </Button>
                     </form>
                 </ThemeProvider>
 
                 {loading ? (
                     <Stack spacing={1}>
-                        <Skeleton animation="wave" width={500} height={100} />
-                        <Skeleton animation="wave" width={500} height={100} />
-                        <Skeleton animation="wave" width={500} height={100} />
                         <Skeleton animation="wave" width={500} height={100} />
                     </Stack>
                 ) : (
