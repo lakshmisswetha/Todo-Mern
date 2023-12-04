@@ -20,3 +20,12 @@ export const paginationValidationSchema = z.object({
     pageIdx: z.coerce.number().positive().gt(0).default(2),
     limit: z.coerce.number().positive().gt(2).default(5),
 });
+
+export const validateLogin = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+});
+export const validateSignup = z.object({
+    username: z.string(),
+    ...validateLogin.shape,
+});

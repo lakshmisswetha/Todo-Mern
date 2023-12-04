@@ -5,12 +5,13 @@ import {
     updateTodo,
     deleteTodo,
 } from "../controllers/todoController";
+import { userAuth } from "../middleware/userAuth";
 
 const router = express.Router();
 
-router.get("/todo", getTodo);
-router.post("/todo", saveTodo);
-router.patch("/todo", updateTodo);
-router.delete("/todo", deleteTodo);
+router.get("/todo", userAuth, getTodo);
+router.post("/todo", userAuth, saveTodo);
+router.patch("/todo", userAuth, updateTodo);
+router.delete("/todo", userAuth, deleteTodo);
 
 export default router;
